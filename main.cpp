@@ -6,72 +6,74 @@
 *   Stavros Avramidis	3/7/2019
 */
 
-#include <stdio.h>
+#include <iostream>
+#include <numeric>
+#include <limits>
+#include <array>
 
-#include "aura_hid.hpp"
-#include "galax_hof_link.hpp"
+#include "AuraDevice.hpp"
+#include "GalaxHOFGraphicsCard.hpp"
+
 
 int main() {
-  AuraHIDDevices aura_devs;
 
-  auto n = detectAuraHIDDevice(aura_devs);
+	std::vector<AuraDevice> auraDevices = detectAuraHIDDevices();
+	auto numberOfAuraDevices = auraDevices.size();
 
-
-  if (!n) {
-    printf("Didn't found any AURA ARGB devices\n");
-    return 1;
-  } else {
-    printf("Found %d %s\n", n, (n==1 ? "device" : "devices"));
-  }
-
-  int     res;
-  uint8_t buf[AURA_ARGB_MSG_LEN];
-  #define MAX_STR 255
-  wchar_t wstr[MAX_STR];
-  hid_device* handle;
-
-  printf("\nOpening Controller 1...\n");
-  handle = hid_open(aura_devs[0].vendor_id, aura_devs[0].product_id, nullptr);
-  if (!handle) {
-    printf("unable to open device\n");
-    return 1;
-  }
-
-  printf("Device Opened\n");
-
-  // Read the Manufacturer String
-  res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
-  wprintf(L"\t%ls\n", wstr);
+	if (auraDevices.empty())
+	{
+		std::cout << "Couldn't find any AURA ARGB devices" << std::endl;
+		return 1;
+	}
+	else
+	{
+		std::cout << "Found " << numberOfAuraDevices << (numberOfAuraDevices == 1 ? " device" : " devices") << std::endl;
+	}
 
 
-  // Create msg in buffer
-  buf[0] = MSG_START;
-  buf[1] = AURA_EFFECT_MODE;    // Control Mode
-  buf[2] = 0x0;                 // Device
-  buf[3] = 0x0;                 // Initial LED position
-  buf[4] = AURA_MODE_STATIC;    // Effect
+	std::array<wchar_t, std::numeric_limits<uint8_t>::max()> manufacturerInfo {};
+	hid_device * device;
 
-  for (auto v = 5; v < AURA_ARGB_MSG_LEN; v += 3) {
-    buf[v]     = 90;
-    buf[v + 1] = 60;
-    buf[v + 2] = 90;
-  }
+	std::cout << "Opening controller 1..." << std::endl;
+	device = hid_open(auraDevices[0].vendor_id, auraDevices[0].product_id, nullptr);
 
-  // Write to device
-  hid_write(handle, buf, AURA_ARGB_MSG_LEN);
+	if (!device) {
+		std::cout << "Unable to open device" << std::endl;
+		return 1;
+	}
 
-  // Close connection to device
-  hid_close(handle);
+	std::cout << "Device opened" << std::endl;
 
+	// Read the Manufacturer String
+	hid_get_manufacturer_string(device, manufacturerInfo.data(), manufacturerInfo.size());
+	std::wcout << L"\t%ls\n" << std::endl;
 
+	uint8_t deviceCommand[AuraARGBMessageLength];
 
-  /* HOF link */
-  HofLinks hof_links;
+	// Create the message in the buffer
+	deviceCommand[0] = StartOfMessageOffset;
+	deviceCommand[1] = AURA_EFFECT_MODE;    // Control Mode
+	deviceCommand[2] = 0x0;                 // Device
+	deviceCommand[3] = 0x0;                 // Initial LED position
+	deviceCommand[4] = AURA_MODE_STATIC;    // Effect
 
-  if (detectHOFLinks(hof_links)) {
-    hof_links[0].init();
-    hof_links[0].setColor(90, 60, 90);
-  }
+	for (auto v = 5; v < AuraARGBMessageLength; v += 3)
+	{
+		deviceCommand[v] = 90;
+		deviceCommand[v + 1] = 60;
+		deviceCommand[v + 2] = 90;
+	}
 
+	// Write to device
+	hid_write(device, deviceCommand, AuraARGBMessageLength);
+
+	// Close connection to device
+	hid_close(device);
+	std::vector<GalaxHOFGraphicsCard> gpus = GalaxHOFGraphicsCard::detectHOFGPUs();
+
+	if (gpus.empty() == false)
+	{
+		gpus[0].setColor(90, 60, 90);
+	}
 }
 

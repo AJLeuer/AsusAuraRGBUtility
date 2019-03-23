@@ -16,18 +16,16 @@
 #include <iostream>
 #include <vector>
 /* local  */
-#include "hidapi.h"
+#include <hidapi/hidapi.h>
 
 #pragma comment(lib, "hidapi.lib")
 
-struct Ligthing_hid_device_info : public hid_device_info {
-  hid_device* handle;
-  uint8_t numOfLeds;
-  /* Constructor for copying hid_device_info obj */
-  explicit Ligthing_hid_device_info(hid_device_info& base, uint8_t nOfLeds = 1);
-  /* Constructor */
-  ~Ligthing_hid_device_info();
+struct HIDLightingDeviceInfo : public hid_device_info
+{
+	hid_device * underlyingDevice;
+	uint8_t numberOfLEDs;
 
-  /* Opens HID handle */
-  bool init();
+	explicit HIDLightingDeviceInfo(hid_device_info & base, uint8_t numberOfLEDs = 1);
+
+	~HIDLightingDeviceInfo();
 };
