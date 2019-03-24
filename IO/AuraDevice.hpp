@@ -47,32 +47,34 @@ struct AuraDevice : public HIDDeviceInterface
 {
 	enum class LightingMode : uint8_t
 	{
-		AuraModeOff                    = 0,        /* OFF mode                             */
-		AuraModeStatic                 = 1,        /* Static color mode                    */
-		AuraModeBreathing              = 2,        /* Breathing effect mode                */
-		AuraModeFlashing               = 3,        /* Flashing effect mode                 */
-		AuraModeSpectrumCycle          = 4,        /* Spectrum Cycle mode                  */
-		AuraModeRainbow                = 5,        /* Rainbow effect mode                  */
-		AuraModeSpectrumCycleBreathing = 6,        /* Rainbow Breathing effect mode        */
-		AuraModeChaseFade              = 7,        /* Chase with Fade effect mode          */
-		AuraModeSpectrumCycleChaseFade = 8,        /* Chase with Fade, Rainbow effect mode */
-		AuraModeChase                  = 9,        /* Chase effect mode                    */
-		AuraModeSpectrumCycleChase     = 10,       /* Chase with Rainbow effect mode       */
-		AuraModeSpectrumCycleWave      = 11,       /* Wave effect mode                     */
-		AuraModeChaseRainbowPulse      = 12,       /* Chase with Rainbow Pulse effect mode */
-		AuraModeRandomFlicker          = 13,       /* Random flicker effect mode           */
-		AuraModeMusic                  = 14,       /* Music Mode                           */
+		Off                    = 0,        /* Off                                  */
+		Static                 = 1,        /* Static color mode                    */
+		Breathing              = 2,        /* Breathing effect mode                */
+		Flashing               = 3,        /* Flashing effect mode                 */
+		SpectrumCycle          = 4,        /* Spectrum Cycle mode                  */
+		Rainbow                = 5,        /* Rainbow effect mode                  */
+		SpectrumCycleBreathing = 6,        /* Rainbow Breathing effect mode        */
+		ChaseFade              = 7,        /* Chase with Fade effect mode          */
+		SpectrumCycleChaseFade = 8,        /* Chase with Fade, Rainbow effect mode */
+		Chase                  = 9,        /* Chase effect mode                    */
+		SpectrumCycleChase     = 10,       /* Chase with Rainbow effect mode       */
+		SpectrumCycleWave      = 11,       /* Wave effect mode                     */
+		ChaseRainbowPulse      = 12,       /* Chase with Rainbow Pulse effect mode */
+		RandomFlicker          = 13,       /* Random flicker effect mode           */
+		Music                  = 14,       /* Music Mode                           */
 	};
 
 	enum class ControlMode : uint8_t
 	{
-		AuraDirectMode = 0X40,    /* Controller Direct Mode State (Manual) */
-		AuraEffectMode = 0X3B,    /* Controller Effect Mode State          */
+		Direct = 0X40,    /* Controller Direct Mode State (Manual) */
+		Effect = 0X3B,    /* Controller Effect Mode State          */
 	};
 
 	uint8_t numberOfLEDs = 1;
 
 	explicit AuraDevice(HIDDeviceInterface & base);
 	static std::vector<AuraDevice> detectAllAuraHIDDevices();
+
+	void applyPresetLightingMode(LightingMode mode);
 };
 

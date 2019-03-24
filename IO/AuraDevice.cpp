@@ -31,3 +31,26 @@ std::vector <AuraDevice> AuraDevice::detectAllAuraHIDDevices()
 
 	return auraDevices;
 }
+
+void AuraDevice::applyPresetLightingMode(AuraDevice::LightingMode mode)
+{
+	openConnectionToDevice();
+
+	std::array<uint8_t, AuraARGBMessageLength> deviceCommand {};
+
+	deviceCommand[0] = StartOfMessageOffset;
+	deviceCommand[1] = static_cast<uint8_t>(ControlMode::Effect); // Control Mode
+	deviceCommand[2] = 0x00;                                      // Device
+	deviceCommand[3] = 0x00;                                      // Initial LED position
+	deviceCommand[4] = static_cast<uint8_t>(mode);                // Effect
+
+	for (auto v = 5; v < AuraARGBMessageLength; v += 3)
+	{
+		deviceCommand[v] = 90;
+		deviceCommand[v + 1] = 60;
+		deviceCommand[v + 2] = 90;
+	}
+
+	sendCommandToDevice(deviceCommand);
+	closeConnectionToDevice();
+}
