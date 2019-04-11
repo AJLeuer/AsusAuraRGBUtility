@@ -66,8 +66,8 @@ struct AuraDevice : public HIDDeviceInterface
 
 	enum class ControlMode : uint8_t
 	{
-		Direct = 0X40,    /* Controller Direct Mode State (Manual) */
-		Effect = 0X3B,    /* Controller Effect Mode State          */
+		Direct = 0x40,    /* Controller Direct Mode State (Manual) */
+		Effect = 0x3B,    /* Controller Effect Mode State          */
 	};
 
 	uint8_t numberOfLEDs = 1;
